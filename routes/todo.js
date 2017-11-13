@@ -19,6 +19,8 @@ router.get(('/'), (req, res) => {
 });
 
 
+
+
 function respondAndRenderTodo(id, res, viewName){
     if (typeof id !== 'undefined') {
         
@@ -111,7 +113,28 @@ router.put('/:id', ( req, res) => {
                res.redirect(`/todo/${req.params.id}`);
            })
     });
-})
+});
+
+
+router.delete('/:id', ( req, res) => {
+
+    const id = req.params.id;
+
+    if (typeof id !== 'undefined') {
+        
+                // Get all todos from the database
+                knex('todo')
+                    .where('id', id) 
+                    .del()
+                    .then(() => {
+                        res.redirect('/todo');
+                    })
+            } else {
+                res.status(500);
+                res.render('error', { message: "Invalid id " })
+            }
+
+});
 
 
 
