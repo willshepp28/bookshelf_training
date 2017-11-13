@@ -8,15 +8,39 @@ const knex = require('../db/knex');
 
 
 /* This router is mounted on http://localhost:3000/todo  */
-router.get(('/'),(req, res) => {
+router.get(('/'), (req, res) => {
+
+    // Get all todos from the database
+    knex('todo')
+        .select()
+        .then(todos => {
+            res.render('all', { todos: todos });
+        })
+});
+
+
+
+
+router.get(('/:id'), (req, res) => {
+    const id = req.params.id;
+
+    if (typeof id !== 'undefined') {
 
         // Get all todos from the database
         knex('todo')
             .select()
-            .then(todos => {
-                res.render('all', { todos: todos });
+            .where('id', id) 
+            .first() // grab the first one
+            .then(todo => {
+                res.render('single', todo);
             })
-    });
+    } else {
+        res.status(500);
+        res.render('error', { message: "Invalid id " })
+    }
+});
+
+
 
 
 
@@ -30,9 +54,9 @@ function validTodo(todo) {
 }
 
 
-router.post('/', ( req, res) => {
+router.post('/', (req, res) => {
     console.log(req.body);
-    if (validTodo(req.body)){
+    if (validTodo(req.body)) {
 
         const todo = {
             title: req.body.title,
